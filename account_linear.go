@@ -117,7 +117,7 @@ type CreateLinearConditionalOrderParam struct {
 }
 
 // CreateLinearOrder :
-func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*CreateLinearConditionalOrderResponse, error) {
+func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearOrderParam) (*CreateLinearConditionalOrderResponse, error) {
 	var res CreateLinearConditionalOrderResponse
 
 	url, err := s.Client.BuildPrivateURL("/private/linear/stop-order/create", nil)
@@ -141,8 +141,8 @@ func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*Creat
 }
 
 // CreateLinearConditionalOrder :
-func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearConditionalOrderParam) (*CreateLinearConditionalOrderResponse, error) {
-	var res CreateLinearConditionalOrderResponse
+func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*CreateLinearOrderResponse, error) {
+	var res CreateLinearOrderResponse
 
 	url, err := s.Client.BuildPrivateURL("/private/linear/order/create", nil)
 	if err != nil {
