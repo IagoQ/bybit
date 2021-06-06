@@ -258,9 +258,23 @@ type CancelLinearOrderResult struct {
 	CancelLinearOrder `json:",inline"`
 }
 
-// CancelLinearOrder :
+// CancelLinearConditionalOrder :
 type CancelLinearOrder struct {
 	OrderID string `json:"order_id"`
+}
+type CancelLinearConditionalOrderResponse struct {
+	CommonResponse `json:",inline"`
+	Result         CancelLinearConditionalOrderResult `json:"result"`
+}
+
+// CancelLinearConditionalOrderResult :
+type CancelLinearConditionalOrderResult struct {
+	CancelLinearConditionalOrder `json:",inline"`
+}
+
+// CancelLinearConditionalOrder :
+type CancelLinearConditionalOrder struct {
+	StopOrderID string `json:"stop_order_id"`
 }
 
 // CancelLinearOrderParam :
@@ -269,6 +283,41 @@ type CancelLinearOrderParam struct {
 
 	OrderID     *string `json:"order_id,omitempty"`
 	OrderLinkID *string `json:"order_link_id,omitempty"`
+}
+
+type CancelLinearConditionalOrderParam struct {
+	Symbol SymbolUSDT `json:"symbol"`
+
+	StopOrderID *string `json:"stop_order_id,omitempty"`
+	OrderLinkID *string `json:"order_link_id,omitempty"`
+}
+
+// CancelLinearConditionalOrder :
+func (s *AccountService) CancelLinearConditionalOrder(param CancelLinearConditionalOrderParam) (*CancelLinearConditionalOrderResponse, error) {
+	var res CancelLinearConditionalOrderResponse
+
+	if param.StopOrderID == nil && param.OrderLinkID == nil {
+		return nil, fmt.Errorf("either OrderID or OrderLinkID needed")
+	}
+
+	url, err := s.Client.BuildPrivateURL("/private/linear/stop-order/cancel", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonBody, err := json.Marshal(param)
+	if err != nil {
+		return nil, fmt.Errorf("json marshal for CancelLinearConditionalOrderParam: %w", err)
+	}
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
 // CancelLinearOrder :
