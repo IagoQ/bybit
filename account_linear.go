@@ -5,7 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
+
+// CreateLinearConditionalOrderResponse :
+type CreateLinearConditionalOrderResponse struct {
+	CommonResponse `json:",inline"`
+	Result         CreateLinearConditionalOrderResult `json:"result"`
+}
+
+// CreateLinearConditionalOrderResult :
+type CreateLinearConditionalOrderResult struct {
+	CreateLinearConditionalOrder `json:",inline"`
+}
 
 // CreateLinearOrderResponse :
 type CreateLinearOrderResponse struct {
@@ -16,6 +28,29 @@ type CreateLinearOrderResponse struct {
 // CreateLinearOrderResult :
 type CreateLinearOrderResult struct {
 	CreateLinearOrder `json:",inline"`
+}
+
+// CreateLinearConditionalOrder :
+type CreateLinearConditionalOrder struct {
+	StopOrderID    string    `json:"stop_order_id"`
+	UserID         int       `json:"user_id"`
+	Symbol         string    `json:"symbol"`
+	Side           string    `json:"side"`
+	OrderType      string    `json:"order_type"`
+	Price          int       `json:"price"`
+	Qty            int       `json:"qty"`
+	TimeInForce    string    `json:"time_in_force"`
+	OrderStatus    string    `json:"order_status"`
+	BasePrice      string    `json:"base_price"`
+	TriggerBy      string    `json:"trigger_by"`
+	TriggerPrice   int       `json:"trigger_price"`
+	OrderLinkID    string    `json:"order_link_id"`
+	ReduceOnly     bool      `json:"reduce_only"`
+	CloseOnTrigger bool      `json:"close_on_trigger"`
+	CreatedTime    time.Time `json:"created_time"`
+	UpdatedTime    time.Time `json:"updated_time"`
+	TpTriggerBy    string    `json:"tp_trigger_by"`
+	SlTriggerBy    string    `json:"sl_trigger_by"`
 }
 
 // CreateLinearOrder :
@@ -61,10 +96,53 @@ type CreateLinearOrderParam struct {
 	SlTriggerBy *string  `json:"sl_trigger_by"`
 	OrderLinkID *string  `json:"order_link_id,omitempty"`
 }
+type CreateLinearConditionalOrderParam struct {
+	Side           Side        `json:"side"`
+	Symbol         SymbolUSDT  `json:"symbol"`
+	OrderType      OrderType   `json:"order_type"`
+	Qty            float64     `json:"qty"`
+	TimeInForce    TimeInForce `json:"time_in_force"`
+	ReduceOnly     bool        `json:"reduce_only"`
+	CloseOnTrigger bool        `json:"close_on_trigger"`
+	TriggerBy      Triggers    `json:"trigger_by"`
+
+	Price       *float64 `json:"price,omitempty"`
+	BasePrice   *float64 `json:"base_price,omitempty"`
+	StopPx      *float64 `json:"stop_px,omitempty"`
+	TakeProfit  *float64 `json:"take_profit,omitempty"`
+	StopLoss    *float64 `json:"stop_loss,omitempty"`
+	TpTriggerBy *string  `json:"tp_trigger_by"`
+	SlTriggerBy *string  `json:"sl_trigger_by"`
+	OrderLinkID *string  `json:"order_link_id,omitempty"`
+}
 
 // CreateLinearOrder :
-func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*CreateLinearOrderResponse, error) {
-	var res CreateLinearOrderResponse
+func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*CreateLinearConditionalOrderResponse, error) {
+	var res CreateLinearConditionalOrderResponse
+
+	url, err := s.Client.BuildPrivateURL("/private/linear/stop-order/create", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonBody, err := json.Marshal(param)
+	if err != nil {
+		return nil, fmt.Errorf("json marshal for CreateLinearOrderParam: %w", err)
+	}
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// CreateLinearConditionalOrder :
+func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearConditionalOrderParam) (*CreateLinearConditionalOrderResponse, error) {
+	var res CreateLinearConditionalOrderResponse
 
 	url, err := s.Client.BuildPrivateURL("/private/linear/order/create", nil)
 	if err != nil {

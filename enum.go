@@ -66,6 +66,14 @@ const (
 	SideSell = Side("Sell")
 )
 
+// triggers :
+type Triggers string
+
+const (
+	LastPrice = Triggers("LastPrice")
+	MarkPrice = Triggers("MarkPrice")
+)
+
 // OrderType :
 type OrderType string
 
