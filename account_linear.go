@@ -116,8 +116,8 @@ type CreateLinearConditionalOrderParam struct {
 	OrderLinkID *string  `json:"order_link_id,omitempty"`
 }
 
-// CreateLinearOrder :
-func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearOrderParam) (*CreateLinearConditionalOrderResponse, error) {
+// CreateLinearConditionalOrder :
+func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearConditionalOrderParam) (*CreateLinearConditionalOrderResponse, error) {
 	var res CreateLinearConditionalOrderResponse
 
 	url, err := s.Client.BuildPrivateURL("/private/linear/stop-order/create", nil)
@@ -140,7 +140,7 @@ func (s *AccountService) CreateLinearConditionalOrder(param CreateLinearOrderPar
 	return &res, nil
 }
 
-// CreateLinearConditionalOrder :
+// CreateLinearOrder :
 func (s *AccountService) CreateLinearOrder(param CreateLinearOrderParam) (*CreateLinearOrderResponse, error) {
 	var res CreateLinearOrderResponse
 
